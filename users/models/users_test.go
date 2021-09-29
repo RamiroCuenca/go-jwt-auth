@@ -24,10 +24,27 @@ func TestUserWithCorrectParams(t *testing.T) {
 	}
 }
 
-func TestUserWithWrongUsername(t *testing.T) {
+func TestUserWithEmptyUsername(t *testing.T) {
 	u := User{
 		Id:        12,
 		Username:  "",
+		Email:     utils.GenerateRandomString(10) + "@example.com",
+		Password:  utils.GenerateRandomString(15),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	if err := validate(u); err == nil {
+		t.Errorf("❌ Created user in spite of sending an empty username: %v.", err)
+	} else {
+		t.Log("✅ Stopped creation of the user with an empty username.")
+	}
+}
+
+func TestUserWithWrongUsername(t *testing.T) {
+	u := User{
+		Id:        12,
+		Username:  utils.GenerateRandomString(53),
 		Email:     utils.GenerateRandomString(10) + "@example.com",
 		Password:  utils.GenerateRandomString(15),
 		CreatedAt: time.Now(),

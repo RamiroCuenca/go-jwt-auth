@@ -21,6 +21,10 @@ func validate(u User) error {
 		return errors.New("Username can not be empty")
 	}
 
+	// Check that the username has less than 51 digits.
+	if len(u.Username) > 50 {
+		return errors.New("Username can not be larger than 50 digits")
+	}
 	// Check that the Email is not empty.
 	if u.Email == "" {
 		return errors.New("Email can not be empty")

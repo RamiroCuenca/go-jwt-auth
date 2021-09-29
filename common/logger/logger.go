@@ -10,7 +10,7 @@ var sugar *zap.SugaredLogger
 
 // This function inits the zap logger.
 // It may be called from the main package at the start of the application.
-func InitZapLogger(sugar *zap.SugaredLogger) error {
+func InitZapLogger() error {
 	l, err := zap.NewDevelopment()
 	if err != nil {
 		log.Printf("Could not init logger: %v", err)

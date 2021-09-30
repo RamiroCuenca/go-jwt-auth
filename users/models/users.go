@@ -32,7 +32,7 @@ func validate(u User) error {
 
 	// Check that the Email contains an @.
 	if !strings.Contains(u.Email, "@") {
-		return errors.New("Email can not be empty")
+		return errors.New("Email must be valid (include @)")
 	}
 
 	// Check that the Password is longer than 6 digits.
@@ -41,4 +41,8 @@ func validate(u User) error {
 	}
 
 	return nil
+}
+
+func Check(u User) error {
+	return validate(u)
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	usersControllers "github.com/RamiroCuenca/go-jwt-auth/users/controllers"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 )
@@ -17,7 +18,7 @@ func Routes() *chi.Mux {
 	pp := "/api/v1"
 
 	// Auth routes
-	r.Post(pp+"/register", nil)
+	r.Post(pp+"/register", usersControllers.SignUp)
 	r.Post(pp+"/login", nil)
 
 	// Content route

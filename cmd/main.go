@@ -19,6 +19,6 @@ func main() {
 	sv := NewServer(mux)
 
 	// Run the server
-	logger.Log().Info("\nServer running over port :8000 ...\n")
+	logger.Log().Info("Server running over port :8000 ...\n")
 	sv.Run()
 }

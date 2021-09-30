@@ -8,5 +8,5 @@ CREATE TABLE IF NOT EXISTS users (
     -- Define CONSTRAINTS
     CONSTRAINT users_id_pk PRIMARY KEY (id),
     CONSTRAINT users_username_uk UNIQUE (username),
-    CONSTRAINT users_email_uk UNIQUE (email),
+    CONSTRAINT users_email_uk UNIQUE (email)
 );

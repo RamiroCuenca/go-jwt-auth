@@ -16,7 +16,7 @@ docker-postgres-createdb:
 
 # This rule deletes the db on the container
 docker-postgres-dropdb:
-	docker exec -it go-auth-container dropdb bank_app
+	docker exec -it go-auth-container dropdb go-auth-database
 
 # This rule runs the migrations up
 run-migrations-up:

@@ -15,7 +15,7 @@ type MyServer struct {
 
 // This function sets up the server configuration and returns the same.
 // It receives as a parameter the multiplexer (In this case from chi).
-func NewServer(mux *chi.Mux) *http.Server {
+func NewServer(mux *chi.Mux) *MyServer {
 	s := &http.Server{
 		Addr:           ":8000",
 		Handler:        mux,
@@ -24,7 +24,7 @@ func NewServer(mux *chi.Mux) *http.Server {
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	return s
+	return &MyServer{s}
 }
 
 // Run works as a method of MyServer struct an it function is to

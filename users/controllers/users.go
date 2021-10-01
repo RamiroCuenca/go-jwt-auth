@@ -9,6 +9,7 @@ import (
 	"github.com/RamiroCuenca/go-jwt-auth/common/logger"
 	"github.com/RamiroCuenca/go-jwt-auth/database/connection"
 	"github.com/RamiroCuenca/go-jwt-auth/users/models"
+	"github.com/RamiroCuenca/go-jwt-auth/utils"
 )
 
 // Registers a new user account
@@ -28,6 +29,13 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	err = models.Check(u)
 	if err != nil {
 		sendError(w, http.StatusBadRequest, err, err.Error())
+		return
+	}
+
+	// Hash the password and replace it on the User field
+	u.Password, err = utils.PasswordHash(u.Password)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, err, "Could not hash the password")
 		return
 	}
 

@@ -94,12 +94,20 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	handler.SendResponse(w, http.StatusCreated, json)
 }
 
+// Log in an existing user
+func SignIn(w http.ResponseWriter, r *http.Request) {
+
+}
+
 func sendError(w http.ResponseWriter, status int, err error, message string) {
 	// Log the error
 	logger.Log().Infof(message, ": ", err)
 
 	// Set a json with the error message
-	data := fmt.Sprintf(`{"message": "%s"}`, message)
+	data := fmt.Sprintf(`{
+	"message": "%s",
+	"error": "%s"
+}`, message, err)
 
 	json := []byte(data)
 	handler.SendError(w, status, json)

@@ -9,12 +9,12 @@ func TestPasswordHasher(t *testing.T) {
 	// Generate the hashed password
 	hashedPassword, err := PasswordHash(p)
 	if err != nil {
-		t.Errorf("There was an error hashing the password: %v", err)
+		t.Errorf("❌ There was an error hashing the password: %v", err)
 	}
 	if hashedPassword == "" {
-		t.Errorf("The hashed password can not be empty")
+		t.Errorf("❌ The hashed password can not be empty")
 	} else {
-		t.Logf("Password hashed succesfully! :) \n HashedPassword: %v", hashedPassword)
+		t.Logf("✅ Password hashed succesfully! :) \n HashedPassword: %v", hashedPassword)
 	}
 }
 
@@ -25,20 +25,20 @@ func TestPasswordVerifierWithCorrectPassword(t *testing.T) {
 	// Generate the hashed password
 	hashedPassword, err := PasswordHash(p)
 	if err != nil {
-		t.Errorf("There was an error hashing the password: %v", err)
+		t.Errorf("❌ There was an error hashing the password: %v", err)
 	}
 	if hashedPassword == "" {
-		t.Errorf("The hashed password can not be empty")
+		t.Errorf("❌ The hashed password can not be empty")
 	} else {
-		t.Logf("Password hashed succesfully! :) \n HashedPassword: %v", hashedPassword)
+		t.Logf("✅ Password hashed succesfully! :) \n HashedPassword: %v", hashedPassword)
 	}
 
 	// Check the password
 	err = PasswordCheck(p, hashedPassword)
 	if err != nil {
-		t.Errorf("The password check failed: %v", err)
+		t.Errorf("❌ The password check failed: %v", err)
 	} else {
-		t.Log("Password checked succesfully! :)")
+		t.Log("✅ Password checked succesfully! :)")
 	}
 }
 
@@ -49,21 +49,21 @@ func TestPasswordVerifierWithWrongPassword(t *testing.T) {
 	// Generate the hashed password
 	hashedPassword, err := PasswordHash(p)
 	if err != nil {
-		t.Errorf("There was an error hashing the password: %v", err)
+		t.Errorf("❌ There was an error hashing the password: %v", err)
 	}
 	if hashedPassword == "" {
-		t.Errorf("The hashed password can not be empty")
+		t.Errorf("❌ The hashed password can not be empty")
 	} else {
-		t.Logf("Password hashed succesfully! :) \n HashedPassword: %v", hashedPassword)
+		t.Logf("✅ Password hashed succesfully! :) \n HashedPassword: %v", hashedPassword)
 	}
 
 	// Check an incorrect password
 	incorrectPassword := "pass12345"
 	err = PasswordCheck(incorrectPassword, hashedPassword)
 	if err == nil {
-		t.Errorf("The password check failed: %v", err)
+		t.Errorf("❌ The password check failed: %v", err)
 	} else {
-		t.Log("Password checked succesfully! :)")
+		t.Log("✅ Password checked succesfully! :)")
 	}
 }
 
@@ -74,28 +74,28 @@ func TestPasswordHasherWithTwoDifferentPasswords(t *testing.T) {
 	// Generate the hashed password
 	hashedPassword, err := PasswordHash(p)
 	if err != nil {
-		t.Errorf("There was an error hashing the password: %v", err)
+		t.Errorf("❌ There was an error hashing the password: %v", err)
 	}
 	if hashedPassword == "" {
-		t.Errorf("The hashed password can not be empty")
+		t.Errorf("❌ The hashed password can not be empty")
 	} else {
-		t.Logf("Password hashed succesfully! :) \n HashedPassword: %v", hashedPassword)
+		t.Logf("✅ Password hashed succesfully! :) \n HashedPassword: %v", hashedPassword)
 	}
 
 	p2 := "pass12345"
 	hashedPassword2, err := PasswordHash(p2)
 	if err != nil {
-		t.Errorf("There was an error hashing the password: %v", err)
+		t.Errorf("❌ There was an error hashing the password: %v", err)
 	}
 	if hashedPassword2 == "" {
-		t.Errorf("The hashed password can not be empty")
+		t.Errorf("❌ The hashed password can not be empty")
 	} else {
-		t.Logf("Password2 hashed succesfully! :) \n HashedPassword2: %v", hashedPassword2)
+		t.Logf("✅ Password2 hashed succesfully! :) \n HashedPassword2: %v", hashedPassword2)
 	}
 
 	if hashedPassword == hashedPassword2 {
-		t.Errorf("The hash of diferent passwords can not be equal")
+		t.Errorf("❌ The hash of diferent passwords can not be equal")
 	} else {
-		t.Log("PasswordHasher is working properly")
+		t.Log("✅ PasswordHasher is working properly")
 	}
 }

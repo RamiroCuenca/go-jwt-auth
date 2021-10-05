@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/RamiroCuenca/go-jwt-auth/auth"
 	"github.com/RamiroCuenca/go-jwt-auth/common/handler"
 	"github.com/RamiroCuenca/go-jwt-auth/common/logger"
 	"github.com/RamiroCuenca/go-jwt-auth/database/connection"
@@ -88,11 +89,27 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	tx.Commit()
 	logger.Log().Infof("User created successfully! :)")
 
-	// 8° Encode the Note into a JSON object
-	json, _ := json.Marshal(u)
+	// 8° As the user is valid, generate a JWT
+	token, err := auth.GenerateToken(u)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, err, "User created successfully but error generating JWT, try loging in...")
+		tx.Rollback()
+		return
+	}
+	logger.Log().Info("JWT generated successfully! :)")
+
+	// 9° If the token was generated successfully, create a Json to send a response
+	// Encode the User into a JSON object
+	userJson, _ := json.Marshal(u)
+
+	responseJson := fmt.Sprintf(`{
+		"Message": "User created successfully",
+		"User": %s,
+		"JWT": "%s"
+	}`, userJson, token)
 
 	// 9° Send the response
-	handler.SendResponse(w, http.StatusCreated, json)
+	handler.SendResponse(w, http.StatusCreated, []byte(responseJson))
 }
 
 // Log in an existing user

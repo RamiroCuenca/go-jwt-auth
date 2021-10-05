@@ -19,7 +19,7 @@ func Routes() *chi.Mux {
 
 	// Auth routes
 	r.Post(pp+"/register", usersControllers.SignUp)
-	r.Post(pp+"/login", nil)
+	r.Post(pp+"/login", usersControllers.SignIn)
 
 	// Content route
 	r.Get(pp+"/content", nil)

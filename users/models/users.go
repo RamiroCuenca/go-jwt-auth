@@ -4,6 +4,8 @@ import (
 	"errors"
 	"strings"
 	"time"
+
+	"github.com/golang-jwt/jwt/v4"
 )
 
 type User struct {
@@ -45,4 +47,14 @@ func validate(u User) error {
 
 func Check(u User) error {
 	return validate(u)
+}
+
+// Claim is the information that will be sent through the JWT
+// In this case we are going to add only the username. The
+// other parameters are going to be automatically added by
+// the library that we are going to use.
+type Claim struct {
+	Id       int64  `json:"id"`
+	Username string `json:"username"`
+	jwt.StandardClaims
 }

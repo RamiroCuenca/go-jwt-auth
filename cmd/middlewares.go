@@ -28,7 +28,7 @@ func AuthenticationMiddleware(f func(w http.ResponseWriter, r *http.Request)) fu
 
 func forbidden(w http.ResponseWriter, r *http.Request) {
 	json := []byte(`{
-		"message": "It hasn't got authorization"
-	}`)
+	"message": "It hasn't got authorization"
+}`)
 	handler.SendError(w, http.StatusForbidden, json)
 }

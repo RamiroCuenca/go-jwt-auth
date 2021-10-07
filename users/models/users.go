@@ -54,7 +54,6 @@ func Check(u User) error {
 // other parameters are going to be automatically added by
 // the library that we are going to use.
 type Claim struct {
-	Id       int64  `json:"id"`
 	Username string `json:"username"`
 	jwt.StandardClaims
 }

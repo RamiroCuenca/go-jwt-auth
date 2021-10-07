@@ -12,7 +12,6 @@ import (
 // The JWT is a string
 func GenerateToken(user models.User) (string, error) {
 	claim := models.Claim{
-		Id:       user.Id,
 		Username: user.Username,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 2).Unix(), // 2hs ot expire

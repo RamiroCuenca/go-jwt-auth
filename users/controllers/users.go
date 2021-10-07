@@ -109,7 +109,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	}`, userJson, token)
 
 	// 9° Send the response
-	handler.SendResponse(w, http.StatusCreated, []byte(responseJson))
+	handler.SendResponse(w, http.StatusCreated, []byte(responseJson), token)
 }
 
 // Log in an existing user
@@ -192,15 +192,30 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 
 	logger.Log().Infof("User logged successfully! :)")
 
-	// 8° Encode the Note into a JSON object
-	// json, _ := json.Marshal(u)
-	data := fmt.Sprintf(`{
-		"message": "User logged in successfully! :)",
-		"username": "%s"
-	}`, u.Username)
+	// 8° As the user is valid, generate a JWT
+	user := models.User{
+		Username: u.Username,
+		Email:    u.Email,
+		Password: u.HashedPassword,
+	}
+	token, err := auth.GenerateToken(user)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, err, "User logged successfully but error generating JWT, try loging in again...")
+		tx.Rollback()
+		return
+	}
+	logger.Log().Info("JWT generated successfully! :)")
+
+	// 9° If the token was generated successfully, create a Json to send a response
+	// Encode the User into a JSON object
+	responseJson := fmt.Sprintf(`{
+		"Message": "User logged in successfully",
+		"Username": %s,
+		"JWT": "%s"
+	}`, u.Username, token)
 
 	// 9° Send the response
-	handler.SendResponse(w, http.StatusCreated, []byte(data))
+	handler.SendResponse(w, http.StatusCreated, []byte(responseJson), token)
 }
 
 func sendError(w http.ResponseWriter, status int, err error, message string) {

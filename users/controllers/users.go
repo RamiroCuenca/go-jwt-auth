@@ -12,6 +12,7 @@ import (
 	"github.com/RamiroCuenca/go-jwt-auth/database/connection"
 	"github.com/RamiroCuenca/go-jwt-auth/users/models"
 	"github.com/RamiroCuenca/go-jwt-auth/utils"
+	"github.com/lib/pq"
 )
 
 // Registers a new user account
@@ -216,6 +217,81 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 
 	// 9° Send the response
 	handler.SendResponse(w, http.StatusCreated, []byte(responseJson), token)
+}
+
+// Get all users
+//
+// The user should be authenticated so it must sent the jwt through the headers
+func ReadAll(w http.ResponseWriter, r *http.Request) {
+	// 1° Create the sql statement and prepare null fields
+	q := `SELECT id, username, email, created_at, updated_at FROM users`
+
+	// 2° Initialize the connection to the database and start a transaction
+	db := connection.NewPostgresClient()
+
+	tx, err := db.Begin()
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, err, "Could not start the transaction")
+		return
+	}
+
+	// 3° Prepare the transaction, remember to close it
+	stmt, err := tx.Prepare(q)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, err, "Could not prepare the transaction")
+		tx.Rollback()
+		return
+	}
+	defer stmt.Close()
+
+	// 4° Execute the query and assign each value to a user object and the append it to an array
+	// We will use QueryRow because the exec method returns two methods that are
+	// not compatible with psql!
+	rows, err := stmt.Query()
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, err, "Could not get rows")
+		tx.Rollback()
+		return
+	}
+	defer rows.Close()
+
+	// 5° Create a users arr and assign each value
+	var usersArr []models.User
+
+	for rows.Next() {
+		var u models.User
+
+		// Prepare null values
+		var nullUpdated pq.NullTime
+
+		err := rows.Scan(
+			&u.Id,
+			&u.Username,
+			&u.Email,
+			&u.CreatedAt,
+			&nullUpdated,
+		)
+		if err != nil {
+			sendError(w, http.StatusBadRequest, err, "Could not start the transaction")
+			tx.Rollback()
+			return
+		}
+
+		u.UpdatedAt = nullUpdated.Time
+
+		usersArr = append(usersArr, u)
+	}
+
+	// 5° Commit transaction
+	tx.Commit()
+	logger.Log().Infof("Users fetched successfully! :)")
+
+	// 6° Encode the usersArr in a json
+	json, _ := json.Marshal(usersArr)
+
+	// 7° Send response
+	handler.SendResponse(w, http.StatusOK, json, "")
+
 }
 
 func sendError(w http.ResponseWriter, status int, err error, message string) {

@@ -1,9 +1,6 @@
 package main
 
 import (
-	"net/http"
-
-	"github.com/RamiroCuenca/go-jwt-auth/common/handler"
 	usersControllers "github.com/RamiroCuenca/go-jwt-auth/users/controllers"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -25,16 +22,5 @@ func Routes() *chi.Mux {
 	r.Post(pp+"/login", usersControllers.SignIn)
 	r.Get(pp+"/readall", AuthenticationMiddleware(usersControllers.ReadAll))
 
-	// Content route
-	r.Get(pp+"/test", AuthenticationMiddleware(testAuthMiddleware))
-
 	return r
-}
-
-func testAuthMiddleware(w http.ResponseWriter, r *http.Request) {
-	// fmt.Fprintf(w, "Hello world! AuthenticationMiddleware working properly! :)")
-	data := `{
-		"message": "Hello world! AuthenticationMiddleware working properly! :)"
-	}`
-	handler.SendResponse(w, http.StatusOK, []byte(data), "")
 }

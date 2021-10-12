@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/RamiroCuenca/go-jwt-auth/auth"
 	"github.com/RamiroCuenca/go-jwt-auth/common/handler"
@@ -291,7 +292,103 @@ func ReadAll(w http.ResponseWriter, r *http.Request) {
 
 	// 7° Send response
 	handler.SendResponse(w, http.StatusOK, json, "")
+}
 
+// Get a specific user by id
+//
+// The user should be authenticated so it must sent the jwt through the headers
+func ReadById(w http.ResponseWriter, r *http.Request) {
+	// 1° Get the id from request url
+	urlParam := r.URL.Query().Get("id") // Return a string... should convert it to int
+	id, err := strconv.Atoi(urlParam)   // Convert it to int
+	if err != nil {
+		sendError(w, http.StatusBadRequest, err, "Could not fetch the id from url params")
+		return
+	}
+
+	// 2° Create a used object where the fetched user will be stored
+	u := models.User{Id: int64(id)}
+
+	// We are going to create a var where store the updated field in case it's null
+	nullUpdateAt := pq.NullTime{}
+
+	// 3° Setup the query to fetch the user
+	q := `SELECT id, username, email, created_at, updated_at
+			FROM users WHERE id = $1`
+
+	// 4° Init the connection to the database and start a transaction
+	db := connection.NewPostgresClient()
+
+	tx, err := db.Begin()
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, err, "Could not start transaction with database")
+		return
+	}
+
+	// 5° Prepare the transaction for the query (return a statement)
+	stmt, err := tx.Prepare(q)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, err, "Could not prepare the query to fetch the user")
+		tx.Rollback()
+		return
+	}
+	defer stmt.Close()
+
+	// 6° Execute the query and assign the returned values to "u" var
+
+	err = stmt.QueryRow(id).Scan(
+		&u.Id,
+		&u.Username,
+		&u.Email,
+		&u.CreatedAt,
+		&nullUpdateAt,
+	)
+
+	u.UpdatedAt = nullUpdateAt.Time
+
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, err, "Could not fetch a user with sent id")
+		tx.Rollback()
+		return
+	}
+
+	// 7° Commit the transaction
+	tx.Commit()
+
+	// 8° Send the response
+	json, _ := json.Marshal(u)
+
+	handler.SendResponse(w, http.StatusOK, json, "")
+
+	/*
+		// 6° Execute the query and scan the row and assign the values to the note
+		err = stmt.QueryRow(n.ID).Scan(
+			&n.ID,
+			&n.OwnerName,
+			&n.Title,
+			&nullDetails, // In case it's null
+			&n.CreatedAt,
+			&nullUpdateAt, // In case it's null
+		)
+		if err != nil {
+			logger.Log().Infof("Error scanning the row: %v", err)
+			handler.SendError(w, 500) // Internal Server Error
+			return
+		}
+
+		n.Details = nullDetails.String
+		n.UpdatedAt = nullUpdateAt.Time
+
+		// 8° Encode the Note as Json using Marshal
+		json, _ := json.Marshal(n)
+
+		// 7° Commit the transaction
+		logger.Log().Info("Record fetched successfully! :)")
+		tx.Commit()
+
+		// 9° Send response
+		handler.SendResponse(w, http.StatusOK, json)
+	*/
 }
 
 func sendError(w http.ResponseWriter, status int, err error, message string) {

@@ -21,6 +21,7 @@ func Routes() *chi.Mux {
 	r.Post(pp+"/register", usersControllers.SignUp)
 	r.Post(pp+"/login", usersControllers.SignIn)
 	r.Get(pp+"/readall", AuthenticationMiddleware(usersControllers.ReadAll))
+	r.Get(pp+"/readbyid", AuthenticationMiddleware(usersControllers.ReadById))
 
 	return r
 }

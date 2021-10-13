@@ -359,37 +359,78 @@ func ReadById(w http.ResponseWriter, r *http.Request) {
 	json, _ := json.Marshal(u)
 
 	handler.SendResponse(w, http.StatusOK, json, "")
-
-	/*
-		// 6° Execute the query and scan the row and assign the values to the note
-		err = stmt.QueryRow(n.ID).Scan(
-			&n.ID,
-			&n.OwnerName,
-			&n.Title,
-			&nullDetails, // In case it's null
-			&n.CreatedAt,
-			&nullUpdateAt, // In case it's null
-		)
-		if err != nil {
-			logger.Log().Infof("Error scanning the row: %v", err)
-			handler.SendError(w, 500) // Internal Server Error
-			return
-		}
-
-		n.Details = nullDetails.String
-		n.UpdatedAt = nullUpdateAt.Time
-
-		// 8° Encode the Note as Json using Marshal
-		json, _ := json.Marshal(n)
-
-		// 7° Commit the transaction
-		logger.Log().Info("Record fetched successfully! :)")
-		tx.Commit()
-
-		// 9° Send response
-		handler.SendResponse(w, http.StatusOK, json)
-	*/
 }
+
+// Update a specific user by id
+//
+// The user should be authenticated so it must sent the jwt through the headers
+func UpdateById(w http.ResponseWriter, r *http.Request) {
+	// 1° Get the id from the request url and convert it to int
+	urlParam := r.URL.Query().Get("id") // Returns a string
+
+	id, err := strconv.Atoi(urlParam) // Convert to int
+	if err != nil {
+		sendError(w, http.StatusBadRequest, err, "Could not fetch the id from url params")
+		return
+	}
+
+	// 2° Create a user object and assign it values from request body
+	u := models.User{Id: int64(id)}
+	nullUpdatedAt := pq.NullTime{}
+
+	err = json.NewDecoder(r.Body).Decode(&u)
+	if err != nil {
+		sendError(w, http.StatusBadRequest, err, "Could not fetch the id from url params")
+		return
+	}
+
+	// 3° Prepare de query to the database
+	q := `UPDATE users SET username = $2, updated_at = now() 
+	WHERE id = $1 
+	RETURNING email, created_at, updated_at`
+
+	// 4° Init the connection to the database and start a transaction
+	db := connection.NewPostgresClient()
+
+	tx, err := db.Begin()
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, err, "Could not start the trasaction to the database")
+		return
+	}
+
+	// 5° Prepare the transaction
+	stmt, err := tx.Prepare(q)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, err, "Could not prepare the trasaction")
+		tx.Rollback()
+		return
+	}
+	defer stmt.Close()
+
+	// 6° Execute the query
+	err = stmt.QueryRow(u.Id, u.Username).Scan(
+		&u.Email,
+		&u.CreatedAt,
+		&nullUpdatedAt,
+	)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, err, "Could not execute the statement")
+		tx.Rollback()
+		return
+	}
+
+	u.UpdatedAt = nullUpdatedAt.Time
+
+	// 7° Commit the transaction
+	tx.Commit()
+
+	// 8° Send response
+	json, _ := json.Marshal(u)
+
+	handler.SendResponse(w, http.StatusOK, []byte(json), "")
+}
+
+// func DeleteById(w http.ResponseWriter, r *http.Request) {}
 
 func sendError(w http.ResponseWriter, status int, err error, message string) {
 	// Log the error

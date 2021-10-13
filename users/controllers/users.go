@@ -285,7 +285,6 @@ func ReadAll(w http.ResponseWriter, r *http.Request) {
 
 	// 5° Commit transaction
 	tx.Commit()
-	logger.Log().Infof("Users fetched successfully! :)")
 
 	// 6° Encode the usersArr in a json
 	json, _ := json.Marshal(usersArr)

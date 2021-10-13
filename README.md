@@ -55,7 +55,7 @@ Returns a json with data from all registered users.
 
 | Header Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
-| `JWT` | `string` | **Required** - Should still be active|
+| `Authorization` | `string` | **Required** - JWT token - Should still be active|
 
 ---
 
@@ -73,7 +73,7 @@ Returns a json with data from the fetched user.
 
 | Header Parameter| Type     | Description                |
 | :-------- | :------- | :------------------------- |
-| `JWT` | `string` | **Required** - Should still be active|
+| `Authorization` | `string` | **Required** - JWT token - Should still be active|
 
 ---
 
@@ -95,7 +95,7 @@ Returns a json with data from the updated user.
 
 | Header Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
-| `JWT` | `string` | **Required** - Should still be active|
+| `Authorization` | `string` | **Required** - JWT token - Should still be active|
 
 ---
 
@@ -113,7 +113,7 @@ Returns a json with data from the deleted user.
 
 | Header Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
-| `JWT` | `string` | **Required** - Should still be active|
+| `Authorization` | `string` | **Required** - JWT token - Should still be active|
 
 
 ## Author

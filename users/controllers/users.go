@@ -430,7 +430,77 @@ func UpdateById(w http.ResponseWriter, r *http.Request) {
 	handler.SendResponse(w, http.StatusOK, []byte(json), "")
 }
 
-// func DeleteById(w http.ResponseWriter, r *http.Request) {}
+// Delete a specific user by id
+//
+// The user should be authenticated
+func DeleteById(w http.ResponseWriter, r *http.Request) {
+	// 1° Get the id from request url and convert it to int
+	urlParam := r.URL.Query().Get("id")
+	id, err := strconv.Atoi(urlParam)
+	if err != nil {
+		sendError(w, http.StatusBadRequest, err, "Could not fetch the id from url params")
+		return
+	}
+
+	// We are going to create a user object to store the values from the deleted user so that
+	// The user can see watch he deleted
+	u := models.User{}
+
+	// In order to manage null values from updated_at
+	nullUpdatedAt := pq.NullTime{}
+
+	// 2° Set up the query
+	q := `DELETE FROM users 
+	WHERE id = $1 
+	RETURNING id, username, email, created_at, updated_at`
+
+	// 3° Open database connection and start transaction
+	db := connection.NewPostgresClient()
+
+	tx, err := db.Begin()
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, err, "Could not start transaction to the database")
+		return
+	}
+
+	// 4° Prepare transaction (statement)
+	stmt, err := tx.Prepare(q)
+	defer stmt.Close()
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, err, "Could not prepare transaction")
+		tx.Rollback()
+		return
+	}
+
+	// 5° Execute query
+	err = stmt.QueryRow(id).Scan(
+		&u.Id,
+		&u.Username,
+		&u.Email,
+		&u.CreatedAt,
+		&nullUpdatedAt,
+	)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, err, "Could not execute query")
+		tx.Rollback()
+		return
+	}
+
+	u.UpdatedAt = nullUpdatedAt.Time
+
+	// 6° Commit transaction
+	tx.Commit()
+
+	// 7° Send Response
+	userJson, _ := json.Marshal(u)
+
+	message := fmt.Sprintf(`{
+		"message": "User deleted successfully",
+		"deleted_user": %s
+	}`, userJson)
+
+	handler.SendResponse(w, http.StatusOK, []byte(message), "")
+}
 
 func sendError(w http.ResponseWriter, status int, err error, message string) {
 	// Log the error

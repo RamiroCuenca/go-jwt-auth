@@ -3,7 +3,8 @@
 
 In this project i made an app that allow the user to:
 - Register / SignUp.
-- LogIn
+- LogIn. 
+
 And when the user authenticates with it credentials it receives a JWT (Json Web Token) with wich he will be able to access other endpoints such as:
 - ReadAll: Fetch all users data.
 - ReadById: Fetch the data from a specific user.

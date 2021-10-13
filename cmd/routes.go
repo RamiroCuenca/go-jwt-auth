@@ -23,6 +23,7 @@ func Routes() *chi.Mux {
 	r.Get(pp+"/readall", AuthenticationMiddleware(usersControllers.ReadAll))
 	r.Get(pp+"/readbyid", AuthenticationMiddleware(usersControllers.ReadById))
 	r.Put(pp+"/updatebyid", AuthenticationMiddleware(usersControllers.UpdateById))
+	r.Delete(pp+"/deletebyid", AuthenticationMiddleware(usersControllers.DeleteById))
 
 	return r
 }

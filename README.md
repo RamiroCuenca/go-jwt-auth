@@ -115,6 +115,19 @@ Returns a json with data from the deleted user.
 | :-------- | :------- | :------------------------- |
 | `Authorization` | `string` | **Required** - JWT token - Should still be active|
 
+## Database Reference
+
+The database that this project use is a PostgresDB and consists in just 1 table called "users".
+
+| Column | Data Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `id` | `SERIAL` | *PRIMARY KEY* |
+| `username` | `VARCHAR(50)` | **NOT NULL** - *Unique* |
+| `email` | `VARCHAR(80)` | **NOT NULL** - *Unique* |
+| `hashed_password` | `VARCHAR(255)` |  **NOT NULL** |
+| `created_at` | `TIMESTAMP` | **NOT NULL** - *DEFAULT NOW()* |
+| `updated_at` | `TIMESTAMP` |  |
+
 
 ## Author
 

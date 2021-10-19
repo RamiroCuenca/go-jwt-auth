@@ -128,6 +128,15 @@ The database that this project use is a PostgresDB and consists in just 1 table 
 | `created_at` | `TIMESTAMP` | **NOT NULL** - *DEFAULT NOW()* |
 | `updated_at` | `TIMESTAMP` |  |
 
+## Tech Stack
+
+**Language:** Go
+
+**Packages:** Chi, Zap, lib/pq, jwt and crypto
+
+**Database:** PostgreSQL
+
+**Others:** Docker
 
 ## Author
 
